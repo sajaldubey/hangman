@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { randomWord } from "./words";
 import "./Hangman.css";
 import img0 from "./0.jpg";
 import img1 from "./1.jpg";
@@ -18,8 +19,17 @@ class Hangman extends Component {
   // answer could have been a prop instead of state
   constructor(props) {
     super(props);
-    this.state = { nWrong: 0, guessed: new Set(), answer: "apple" };
+    this.state = { nWrong: 0, guessed: new Set(), answer: randomWord() };
     this.handleGuess = this.handleGuess.bind(this);
+    this.reset = this.reset.bind(this);
+  }
+
+  reset() {
+    this.setState({
+      nWrong: 0,
+      guessed: new Set(),
+      answer: randomWord(),
+    });
   }
 
   /** guessedWord: show current-state of word:
@@ -61,6 +71,10 @@ class Hangman extends Component {
   render() {
     let gameOver = this.state.nWrong >= this.props.maxWrong;
     let altText = `${this.state.nWrong}/${this.props.maxWrong} wrong guesses`;
+    let isWinner = this.guessedWord().join("") === this.state.answer;
+    let gameState = this.generateButtons();
+    if (isWinner) gameState = "You Win!!!";
+    if (gameOver) gameState = "You Lose!!!";
     return (
       <div className="Hangman">
         <h1>Hangman</h1>
@@ -74,9 +88,10 @@ class Hangman extends Component {
         <p className="Hangman-word">
           {!gameOver ? this.guessedWord() : this.state.answer}
         </p>
-        <p className="Hangman-btns">
-          {!gameOver ? this.generateButtons() : "Bhery Sed - You Lost!!"}
-        </p>
+        <p className="Hangman-btns">{gameState} </p>
+        <button id="Reset-btn" onClick={this.reset}>
+          Reset?
+        </button>
       </div>
     );
   }
